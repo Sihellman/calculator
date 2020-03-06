@@ -1,10 +1,15 @@
 package edu.blitstein.calc.engine;
 
+import edu.blitstein.calc.engine.op.BinaryOperation;
+import edu.blitstein.calc.engine.op.BinaryOperationFactory;
+import edu.blitstein.calc.engine.op.UnaryOperation;
+import edu.blitstein.calc.engine.op.UnaryOperationFactory;
 import edu.blitstein.calc.exception.DivideByZeroException;
+import edu.blitstein.calc.exception.UnknownOpException;
 
 public class Calculator {
     private double result;
-    private final double precision = 0.001;
+
 
     public Calculator() {
         this(0.0);
@@ -30,27 +35,27 @@ public class Calculator {
      * Returns n1 op n2, provided op is one of '+', '', '*',or '/'.
      * Any other value of op throws UnknownOpException.
      */
-    public double evaluate(char op, double n1, double n2)
-            throws DivideByZeroException {
+    public double evaluate(char opChar, double n1, double n2)
+            throws DivideByZeroException, UnknownOpException {
         double answer;
-        switch (op) {
-            case '+':
-                answer = n1 + n2;
-                break;
-            case '-':
-                answer = n1 - n2;
-                break;
-            case '*':
-                answer = n1 * n2;
-                break;
-            case '/':
-                if ((-precision < n2) && (n2 < precision))
-                    throw new DivideByZeroException();
-                answer = n1 / n2;
-                break;
-            default:
-                throw new UnknownOpException(op);
-        }
+        BinaryOperation op = BinaryOperationFactory.getOperation(opChar);
+        answer = op.apply(n1, n2);
+
         return answer;
+    }
+    public double evaluate(char opChar, double n1){
+        double answer;
+        UnaryOperation op2 = UnaryOperationFactory.getOperation(opChar);
+        answer = op2.apply(n1);
+        return answer;
+    }
+    public boolean determineIfUnary(char opChar){
+        UnaryOperation op = UnaryOperationFactory.getOperation(opChar);
+        if (op == null){
+            return false;
+        }
+        else{
+            return true;
+        }
     }
 }
